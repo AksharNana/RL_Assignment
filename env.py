@@ -54,20 +54,19 @@ class Gym2OpEnv(gym.Env):
         self.setup_observations()
         self.setup_actions()
 
-        self.observation_space = self._gym_env.observation_space
-        self.action_space = self._gym_env.action_space
-
     def setup_observations(self):
         # TODO: Your code to specify & modify the observation space goes here
         # See Grid2Op 'getting started' notebooks for guidance
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
-        print("WARNING: setup_observations is not doing anything. Implement your own code in this method.")
+
+        self.observation_space = self._gym_env.observation_space
 
     def setup_actions(self):
         # TODO: Your code to specify & modify the action space goes here
         # See Grid2Op 'getting started' notebooks for guidance
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
-        print("WARNING: setup_actions is not doing anything. Implement your own code in this method.")
+
+        self.action_space = self._gym_env.action_space
 
     def reset(self, seed=None):
         return self._gym_env.reset(seed=seed, options=None)
