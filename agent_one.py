@@ -1,4 +1,5 @@
 import json
+import time
 import gymnasium as gym
 from gymnasium.spaces import Discrete, MultiDiscrete, Box
 
@@ -78,10 +79,12 @@ class Gym2OpEnv(gym.Env):
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
 
         self._gym_env.action_space.close()
-        act_attr_to_keep =  ["set_line_status_simple", "set_bus"]
-        self._gym_env.action_space = DiscreteActSpace(self._g2op_env.action_space,
+        act_attr_to_keep =  ["set_line_status", "set_bus"]
+        self._gym_env.action_space = BoxGymActSpace(self._g2op_env.action_space,
                                                       attr_to_keep=act_attr_to_keep)
-        self.action_space = Discrete(self._gym_env.action_space.n)
+        self.action_space = Box(shape=self._gym_env.action_space.shape,
+                                     low=self._gym_env.action_space.low,
+                                     high=self._gym_env.action_space.high)
 
     def reset(self, seed=None):
         return self._gym_env.reset(seed=seed, options=None)
@@ -94,29 +97,59 @@ class Gym2OpEnv(gym.Env):
         return self._gym_env.render()
 
 
-from stable_baselines3.common.callbacks import BaseCallback
-
-# Custom callback class to print progress
-class ProgressCallback(BaseCallback):
-    def __init__(self, verbose=1, print_freq=100):
-        super(ProgressCallback, self).__init__(verbose)
-        self.print_freq = print_freq  # Frequency at which to print the progress
-
-    def _on_step(self) -> bool:
-        # This will be called after every step in the environment
-        if self.n_calls % self.print_freq == 0:
-            # n_calls is the number of times the callback has been called
-            print(f"Step: {self.n_calls}, Timesteps: {self.num_timesteps}, Reward: {self.locals['rewards']}")
-        return True  # To continue training
-
-from stable_baselines3 import PPO
-
+from stable_baselines3 import PPO, SAC
+from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import DummyVecEnv
 env = Gym2OpEnv()
-gym_env = env._gym_env
-agent = PPO("MlpPolicy", gym_env, verbose=0)
+gym_env = env = DummyVecEnv(
+    [
+        lambda: Monitor(
+            env._gym_env
+        )
+    ]
+)
 
-progress_callback = ProgressCallback(print_freq=1)
-agent.learn(total_timesteps=10, callback=progress_callback)
+model = SAC(
+    "MlpPolicy",
+    gym_env,
+    learning_rate=0.0001,  # Adjusted learning rate for stability
+    batch_size=256,        # Increased batch size for better updates
+    tau=0.005,
+    gamma=0.90,            # Adjusted discount factor for longer-term rewards
+    target_update_interval=10,  # More frequent target updates
+    ent_coef="auto",       # Keep auto, but monitor its decay
+    verbose=1,
+    tensorboard_log="./tb_logs/",
+    device="cuda",
+    buffer_size=10000,
+    learning_starts=2000,
+)
+
+callbacks = []
+eval_callback = EvalCallback(
+    env,
+    callback_on_new_best=None,
+    n_eval_episodes=5,
+    best_model_save_path=".",
+    log_path=".",
+    deterministic=True,
+    eval_freq=100,
+)
+
+callbacks.append(eval_callback)
+
+kwargs = {}
+kwargs["callback"] = callbacks
+
+# Train for a certain number of timesteps
+model.learn(
+    total_timesteps=20000, tb_log_name="PPO_TRAIN" + str(time.time()), **kwargs
+)
+
+# Save policy weights
+model.save("PPO_GRID.pt")
+
 
 nb_episode_test = 2
 seeds_test_env = (0, 1)    # same size as nb_episode_test
@@ -125,17 +158,16 @@ ts_ep_test =  (0, 1)       # same size as nb_episode_test
 
 ep_infos = {}  # information that will be saved
 
-
 for ep_test_num in range(nb_episode_test):
     init_obs, init_infos = gym_env.reset(seed=seeds_test_env[ep_test_num],
                                          options={"time serie id": ts_ep_test[ep_test_num]})
-    agent.set_random_seed(seeds_test_agent[ep_test_num])
+    model.set_random_seed(seeds_test_agent[ep_test_num])
     done = False
     cum_reward = 0
     step_survived = 0
     obs = init_obs
     while not done:
-        act, _states = agent.predict(obs, deterministic=True)
+        act, _states = model.predict(obs, deterministic=True)
         obs, reward, terminated, truncated, info = gym_env.step(act)
         step_survived += 1
         cum_reward += float(reward)
