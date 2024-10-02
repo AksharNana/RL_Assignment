@@ -102,7 +102,7 @@ from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 env = Gym2OpEnv()
-gym_env = env = DummyVecEnv(
+gym_env = DummyVecEnv(
     [
         lambda: Monitor(
             env._gym_env
@@ -131,10 +131,10 @@ eval_callback = EvalCallback(
     env,
     callback_on_new_best=None,
     n_eval_episodes=5,
-    best_model_save_path=".",
-    log_path=".",
+    best_model_save_path="./models",
+    log_path="./logs",
     deterministic=True,
-    eval_freq=100,
+    eval_freq=5000,
 )
 
 callbacks.append(eval_callback)
@@ -144,23 +144,24 @@ kwargs["callback"] = callbacks
 
 # Train for a certain number of timesteps
 model.learn(
-    total_timesteps=20000, tb_log_name="PPO_TRAIN" + str(time.time()), **kwargs
+    total_timesteps=100000, tb_log_name="SAC_TRAIN" + str(time.time()), **kwargs
 )
 
 # Save policy weights
 model.save("PPO_GRID.pt")
 
 
-nb_episode_test = 2
-seeds_test_env = (0, 1)    # same size as nb_episode_test
-seeds_test_agent = (3, 4)  # same size as nb_episode_test
-ts_ep_test =  (0, 1)       # same size as nb_episode_test
+# Load policy weights
+model.load("PPO_GRID.pt")
+nb_episode_test = 5
+seeds_test_env = (0, 1, 2, 3, 4, 5)    # same size as nb_episode_test
+seeds_test_agent = (3, 4, 5, 6, 7)  # same size as nb_episode_test
+ts_ep_test =  (0, 1, 2, 3, 4, 5)       # same size as nb_episode_test
 
 ep_infos = {}  # information that will be saved
 
 for ep_test_num in range(nb_episode_test):
-    init_obs, init_infos = gym_env.reset(seed=seeds_test_env[ep_test_num],
-                                         options={"time serie id": ts_ep_test[ep_test_num]})
+    init_obs, init_infos = env.reset(seed=seeds_test_env[ep_test_num])
     model.set_random_seed(seeds_test_agent[ep_test_num])
     done = False
     cum_reward = 0
@@ -168,7 +169,7 @@ for ep_test_num in range(nb_episode_test):
     obs = init_obs
     while not done:
         act, _states = model.predict(obs, deterministic=True)
-        obs, reward, terminated, truncated, info = gym_env.step(act)
+        obs, reward, terminated, truncated, info = env.step(act)
         step_survived += 1
         cum_reward += float(reward)
         done = terminated or truncated

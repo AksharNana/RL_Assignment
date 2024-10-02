@@ -9,7 +9,7 @@ Farama-Notifications==0.0.4
 filelock==3.16.1
 fonttools==4.54.1
 fsspec==2024.9.0
-Grid2Op @ file:///home/akshar/RL_Assignment/Grid2Op
+Grid2Op==1.10.3
 grpcio==1.66.2
 gymnasium==0.29.1
 idna==3.10
