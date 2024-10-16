@@ -1,6 +1,7 @@
 import json
 import time
 import gymnasium as gym
+from gymnasium import Env
 from gymnasium.spaces import Discrete, MultiDiscrete, Box
 
 import grid2op
@@ -62,7 +63,7 @@ class Gym2OpEnv(gym.Env):
         # TODO: Your code to specify & modify the observation space goes here
         # See Grid2Op 'getting started' notebooks for guidance
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
-        obs_attr_to_keep = ["rho", "p_or", "gen_p", "load_p"]
+        obs_attr_to_keep = ["gen_p","gen_q","load_p","load_q","rho","curtailment"]
         self._gym_env.observation_space.close()
         self._gym_env.observation_space = BoxGymObsSpace(self._g2op_env.observation_space,
                                                          attr_to_keep=obs_attr_to_keep
@@ -79,51 +80,47 @@ class Gym2OpEnv(gym.Env):
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
 
         self._gym_env.action_space.close()
-        act_attr_to_keep =  ["set_line_status", "set_bus"]
-        self._gym_env.action_space = BoxGymActSpace(self._g2op_env.action_space,
-                                                      attr_to_keep=act_attr_to_keep)
-        self.action_space = Box(shape=self._gym_env.action_space.shape,
-                                     low=self._gym_env.action_space.low,
-                                     high=self._gym_env.action_space.high)
+        act_attr_to_keep = ["curtail","set_bus","redispatch"]
+
+        self._gym_env.action_space = MultiDiscreteActSpace(self._g2op_env.action_space,
+                                                           attr_to_keep=act_attr_to_keep)
+        self.action_space = MultiDiscrete(self._gym_env.action_space.nvec)
 
     def reset(self, seed=None):
         return self._gym_env.reset(seed=seed, options=None)
 
     def step(self, action):
         return self._gym_env.step(action)
-
+  
     def render(self):
         # TODO: Modify for your own required usage
         return self._gym_env.render()
 
 
-from stable_baselines3 import PPO, SAC
+from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 env = Gym2OpEnv()
+
 gym_env = DummyVecEnv(
     [
         lambda: Monitor(
-            env._gym_env
+           env._gym_env
         )
     ]
 )
 
-model = SAC(
+model = PPO(
     "MlpPolicy",
     gym_env,
     learning_rate=0.0001,  # Adjusted learning rate for stability
-    batch_size=256,        # Increased batch size for better updates
-    tau=0.005,
-    gamma=0.90,            # Adjusted discount factor for longer-term rewards
-    target_update_interval=10,  # More frequent target updates
-    ent_coef="auto",       # Keep auto, but monitor its decay
+    batch_size=32,        # Increased batch size for better updates
+    gamma=0.99,            # Adjusted discount factor for longer-term rewards
+    ent_coef=0.01,       # Keep auto, but monitor its decay
     verbose=1,
     tensorboard_log="./tb_logs/",
     device="cuda",
-    buffer_size=10000,
-    learning_starts=2000,
 )
 
 callbacks = []
@@ -134,7 +131,7 @@ eval_callback = EvalCallback(
     best_model_save_path="./models",
     log_path="./logs",
     deterministic=True,
-    eval_freq=5000,
+    eval_freq=10000,
 )
 
 callbacks.append(eval_callback)
@@ -144,15 +141,17 @@ kwargs["callback"] = callbacks
 
 # Train for a certain number of timesteps
 model.learn(
-    total_timesteps=100000, tb_log_name="SAC_TRAIN" + str(time.time()), **kwargs
+    total_timesteps=150000, tb_log_name="PPO_TRAIN" + str(time.time()), **kwargs
 )
 
-# Save policy weights
-model.save("PPO_GRID.pt")
+# # Save policy weights
+# model.save("PPO_GRID.pt")
 
 
 # Load policy weights
-model.load("PPO_GRID.pt")
+# model.load("PPO_GRID.pt")
+
+
 nb_episode_test = 5
 seeds_test_env = (0, 1, 2, 3, 4, 5)    # same size as nb_episode_test
 seeds_test_agent = (3, 4, 5, 6, 7)  # same size as nb_episode_test
@@ -182,3 +181,56 @@ for ep_test_num in range(nb_episode_test):
                              "cum reward": cum_reward}
     
 print(json.dumps(ep_infos, indent=4))
+
+
+max_steps = 1000
+print("#####################")
+print("# OBSERVATION SPACE #")
+print("#####################")
+print(env.observation_space)
+print("#####################\n")
+
+print("#####################")
+print("#   ACTION SPACE    #")
+print("#####################")
+print(env.action_space)
+print("#####################\n\n")
+
+curr_step = 0
+curr_return = 0
+
+is_done = False
+obs, info = env.reset()
+print(f"step = {curr_step} (reset):")
+print(f"\t obs = {obs}")
+print(f"\t info = {info}\n\n")
+
+while not is_done and curr_step < max_steps:
+    action = env.action_space.sample()
+    obs, reward, terminated, truncated, info = env.step(action)
+
+    curr_step += 1
+    curr_return += reward
+    is_done = terminated or truncated
+
+    print(f"step = {curr_step}: ")
+    print(f"\t obs = {obs}")
+    print(f"\t reward = {reward}")
+    print(f"\t terminated = {terminated}")
+    print(f"\t truncated = {truncated}")
+    print(f"\t info = {info}")
+
+    # Some actions are invalid (see: https://grid2op.readthedocs.io/en/latest/action.html#illegal-vs-ambiguous)
+    # Invalid actions are replaced with 'do nothing' action
+    is_action_valid = not (info["is_illegal"] or info["is_ambiguous"])
+    print(f"\t is action valid = {is_action_valid}")
+    if not is_action_valid:
+        print(f"\t\t reason = {info['exception']}")
+    print("\n")
+
+print("###########")
+print("# SUMMARY #")
+print("###########")
+print(f"return = {curr_return}")
+print(f"total steps = {curr_step}")
+print("###########")
