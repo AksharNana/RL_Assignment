@@ -3,6 +3,8 @@ import time
 import gymnasium as gym
 from gymnasium.spaces import Discrete, MultiDiscrete, Box
 
+#scale the observations/actions
+
 import grid2op
 from grid2op import gym_compat
 from grid2op.Parameters import Parameters
@@ -61,12 +63,12 @@ class Gym2OpEnv(gym.Env):
     def setup_observations(self):
         # Define attribute names and their corresponding indices in the observation array
         self.obs_attr_to_keep = ["rho", "p_or", "gen_p", "load_p"]
-        # Example: Assuming these are the indices in the CompleteObservation array
+        
         self.obs_indices = {
-            "rho": 0,      # replace with actual index
-            "p_or": 1,     # replace with actual index
-            "gen_p": 2,    # replace with actual index
-            "load_p": 3    # replace with actual index
+            "rho": 0,      
+            "p_or": 1,     
+            "gen_p": 2,   
+            "load_p": 3    
         }
         
         # Set up the observation space
@@ -81,7 +83,7 @@ class Gym2OpEnv(gym.Env):
         
         # Create bins for each observation attribute
         self.obs_bins = {}
-        n_bins = 10  # Example: 10 bins for each continuous variable
+        n_bins = 10  
         for attr in self.obs_attr_to_keep:
             obs_low = self._gym_env.observation_space.low[self.obs_indices[attr]]
             obs_high = self._gym_env.observation_space.high[self.obs_indices[attr]]
@@ -92,12 +94,15 @@ class Gym2OpEnv(gym.Env):
         # Convert continuous observations to discrete using bins
         discrete_obs = []
         for attr in self.obs_attr_to_keep:
-            # Digitize each observation using the corresponding bins
             index = self.obs_indices[attr]
             bin_edges = self.obs_bins[attr]
             digitized_value = np.digitize(obs[index], bin_edges) - 1  # Adjust index to start from 0
+            
+            # Handle out-of-bounds values
+            digitized_value = np.clip(digitized_value, 0, len(bin_edges) - 2)
             discrete_obs.append(digitized_value)
         return np.array(discrete_obs)
+
 
 
     def setup_actions(self):

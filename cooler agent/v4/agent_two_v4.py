@@ -22,11 +22,11 @@ model = DQN(
     target_update_interval=500,
     verbose=1,
     tensorboard_log="./tb_logs/",
-     policy_kwargs=policy_kwargs  # Use the custom architecture
+    policy_kwargs=policy_kwargs  # Use the custom architecture
 )
 
 # Train the model
-model.learn(total_timesteps=15000)
+model.learn(total_timesteps=10000)
 
 # Save and load the model
 model.save("DQN_GRID.pt")
