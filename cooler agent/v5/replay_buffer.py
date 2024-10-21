@@ -25,8 +25,10 @@ class PrioritizedReplayBuffer(ReplayBuffer):
             handle_timeout_termination=handle_timeout_termination,
         )
         
-        self.alpha = 0.4
-        self.priorities = np.zeros((buffer_size,), dtype=np.float32)
+        self.alpha = 0.6
+        self.priorities = np.full((buffer_size,), 1e-5, dtype=np.float32)
+        self.indices = None  # Store sampled indices
+        self.weights = None  # Store importance sampling weights
 
     def add(
         self,
@@ -37,11 +39,15 @@ class PrioritizedReplayBuffer(ReplayBuffer):
         done: np.ndarray,
         infos: List[Dict[str, Any]],
     ) -> None:
-        max_prio = self.priorities.max() if self.full else 1.0
+        
         super().add(obs, next_obs, action, reward, done, infos)  # Call the parent add method
+
+        max_prio = self.priorities.max() if self.full else 1.0
+        
         
         # Update the priority of the new sample
-        self.priorities[self.pos] = max_prio
+        self.priorities[self.pos] = max(max_prio, 1e-5)  # Ensure non-negative priority
+
 
     def sample(self, batch_size: int, beta: float = 0.4, env: Optional[VecNormalize] = None):
         if self.size() == 0:  # Use self.size() method to get buffer size
@@ -59,15 +65,19 @@ class PrioritizedReplayBuffer(ReplayBuffer):
 
         # Retrieve the actual data from the buffer (parent class handles this)
         replay_data = super()._get_samples(indices, env=env)
-      
 
         total = self.size()
         weights = (total * probs[indices]) ** (-beta)
         weights /= weights.max()
 
-        # Return replay data along with weights and indices
-        return replay_data  #, indices, np.array(weights, dtype=np.float32)
+        # Store indices and weights for later use
+        self.indices = indices
+        self.weights = np.array(weights, dtype=np.float32)
+
+        # Return replay data (without weights and indices)
+        return replay_data
 
     def update_priorities(self, batch_indices: np.ndarray, batch_priorities: np.ndarray) -> None:
+        batch_priorities = np.clip(batch_priorities, a_min=1e-5, a_max=None)  # Avoid zero priorities
         for idx, prio in zip(batch_indices, batch_priorities):
             self.priorities[idx] = prio
