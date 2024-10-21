@@ -1,130 +1,114 @@
-step = 131: 
-         reward = 0.34380093216896057
+
+
+step = 2536: 
+         reward = 0.2415970265865326
          terminated = False
          truncated = False
          info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0073', 'rewards': {}}
+       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': True, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [Grid2OpException AmbiguousAction InvalidRedispatching InvalidRedispatching('You cannot ask for a dispatch higher than pmax - pmin  [it would be always invalid because, even if the sepoint is pmin, this dispatch would set it to a number higher than pmax, which is impossible]. Invalid dispatch for generator(s): [1]')], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0074', 'rewards': {}}
          is action valid = True
 
 
-step = 132: 
-         reward = 0.36141443252563477
+step = 2537: 
+         reward = 0.24022236466407776
          terminated = False
          truncated = False
          info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0073', 'rewards': {}}
+       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': True, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [Grid2OpException AmbiguousAction InvalidRedispatching InvalidRedispatching('You cannot ask for a dispatch higher than pmax - pmin  [it would be always invalid because, even if the sepoint is pmin, this dispatch would set it to a number higher than pmax, which is impossible]. Invalid dispatch for generator(s): [1]')], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0074', 'rewards': {}}
          is action valid = True
 
 
-step = 133: 
-         reward = 0.3475065231323242
-         terminated = False
-         truncated = False
-         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0073', 'rewards': {}}
-         is action valid = True
-
-
-step = 134: 
-         reward = 0.3634882867336273
-         terminated = False
-         truncated = False
-         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0073', 'rewards': {}}
-         is action valid = True
-
-
-step = 135: 
+step = 2538: 
          reward = -0.5
          terminated = True
          truncated = False
-         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': True, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [Grid2OpException AmbiguousAction InvalidRedispatching InvalidRedispatching('\nThis is an attempt to explain why the dispatch did not succeed and caused a game over.\nTo compensate the increase of loads and / or decrease of renewable energy (due to naturl causes but also through curtailment) and / or variation in the storage units, the generators should increase their total production of 31.09MW (in total).\nBut, if you take into account the generator constraints (pmax and max_ramp_up) you can have at most 26.30MW.\nIndeed at time t, generators are in state:\n\t[ 65.71 113.7   37.38]\ntheir ramp max is:\n\t[ 5. 10. 15.]\n and pmax is:\n\t[140. 120. 100.]\nWrapping up, each generator can increase at maximum of:\n\t[ 5.   6.3 15. ]\nNB: if you did not do any dispatch during this episode, it would have been possible to meet these constraints. This situation is caused by not having enough degree of freedom to "compensate" the variation of the load due to (most likely) an "over usage" of redispatching feature (some generators stuck at pmax as a consequence of your redispatching. They can\'t increase their productions to meet the increase in demand or decrease of renewables)'), Grid2OpException AmbiguousAction InvalidRedispatching InvalidRedispatching('Game over due to infeasible redispatching state. The routine used to compute the "next state" has diverged. This means that there is no way to compute a physically valid generator state (one that meets all pmin / pmax - ramp min / ramp max with the information provided. As one of the physical constraints would be violated, this means that a generator would be damaged in real life. This is a game over.')], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0073', 'rewards': {}}
+         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  1,  2, -1,  2,  2, -1, -1,
+        0, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': True, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [Grid2OpException AmbiguousAction InvalidRedispatching InvalidRedispatching('You cannot ask for a dispatch higher than pmax - pmin  [it would be always invalid because, even if the sepoint is pmin, this dispatch would set it to a number higher than pmax, which is impossible]. Invalid dispatch for generator(s): [1]'), Grid2OpException BackendError BackendError('Divergence of DC powerflow (non connected grid) at the initialization of AC powerflow. Detailed error: ErrorType.SolverFactor')], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0074', 'rewards': {}}
          is action valid = True
 
 
 ###########
 # SUMMARY #
 ###########
-return = 47.572202771902084
-total steps = 135
+return = 891.5429826676846
+total steps = 2538
 Number of failed actions = 0
 ###########
 {
           "0": {
                     "time serie id": 0,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0074",
-                    "steps survived": 2538,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0075",
+                    "steps survived": 518,
                     "total steps": 8064,
-                    "cum reward": 857.8646489679813
+                    "cum reward": 180.40767312049866
           },
           "1": {
                     "time serie id": 1,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0075",
-                    "steps survived": 406,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0076",
+                    "steps survived": 1091,
                     "total steps": 8064,
-                    "cum reward": 140.45315998792648
+                    "cum reward": 370.54886212944984
           },
           "2": {
                     "time serie id": 2,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0076",
-                    "steps survived": 1019,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0077",
+                    "steps survived": 8064,
                     "total steps": 8064,
-                    "cum reward": 333.45194855332375
+                    "cum reward": 2689.599269002676
           },
           "3": {
                     "time serie id": 3,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0077",
-                    "steps survived": 4417,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0078",
+                    "steps survived": 2534,
                     "total steps": 8064,
-                    "cum reward": 1417.7173537313938
+                    "cum reward": 870.6888107657433
           },
           "4": {
                     "time serie id": 4,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0078",
-                    "steps survived": 2447,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0079",
+                    "steps survived": 514,
                     "total steps": 8064,
-                    "cum reward": 812.8206220120192
+                    "cum reward": 178.84987235069275
           },
           "5": {
                     "time serie id": 5,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0079",
-                    "steps survived": 513,
-                    "total steps": 8064,
-                    "cum reward": 170.24721935391426
-          },
-          "6": {
-                    "time serie id": 6,
                     "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0080",
                     "steps survived": 1095,
                     "total steps": 8064,
-                    "cum reward": 363.43917778134346
+                    "cum reward": 380.0921194702387
+          },
+          "6": {
+                    "time serie id": 6,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0081",
+                    "steps survived": 974,
+                    "total steps": 8064,
+                    "cum reward": 344.64805111289024
           },
           "7": {
                     "time serie id": 7,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0081",
-                    "steps survived": 3551,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0082",
+                    "steps survived": 1245,
                     "total steps": 8064,
-                    "cum reward": 1184.9169712215662
+                    "cum reward": 441.2748962044716
           },
           "8": {
                     "time serie id": 8,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0082",
-                    "steps survived": 1246,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0083",
+                    "steps survived": 2249,
                     "total steps": 8064,
-                    "cum reward": 427.6483051776886
+                    "cum reward": 776.5766386091709
           },
           "9": {
                     "time serie id": 9,
-                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0083",
-                    "steps survived": 523,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0084",
+                    "steps survived": 1101,
                     "total steps": 8064,
-                    "cum reward": 183.0811856687069
+                    "cum reward": 394.7247805893421
           }
 }
 ###########
 # SUMMARY #
 ###########
-Average reward = 589.1640592455864
-total steps survived= 1775.5
+Average reward = 662.7410973355175
+total steps survived= 1938.5
 ###########

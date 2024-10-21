@@ -70,26 +70,28 @@ class Gym2OpEnv(gym.Env):
         self._gym_env.observation_space.close()
         gen_pmax = self._g2op_env.gen_pmax
         
-        observation_space = observation_space.reencode_space("actual_dispatch", 
-                                        ScalerAttrConverter(substract=0.,
-                                                            divide=gen_pmax,
-                                                            init_space=observation_space["actual_dispatch"])
-                                        )
+        # observation_space = observation_space.reencode_space("actual_dispatch", 
+        #                                 ScalerAttrConverter(substract=0.,
+        #                                                     divide=gen_pmax,
+        #                                                     init_space=observation_space["actual_dispatch"])
+        #                                 )
 
-        observation_space = observation_space.reencode_space("gen_p", 
-                                        ScalerAttrConverter(substract=0.,
-                                                            divide=gen_pmax,
-                                                            init_space=observation_space["gen_p"])
-                                        )
+        # observation_space = observation_space.reencode_space("load_p",
+        #                                 ScalerAttrConverter(substract=obs_gym["load_p"],
+        #                                                     divide=0.5 * obs_gym["load_p"]
+        #                                                     )
+        #                                 )
+        obs_gym, info = self._gym_env.reset()
         self._gym_env.observation_space = observation_space
-
         self._gym_env.observation_space = BoxGymObsSpace(self._g2op_env.observation_space,
-                                                         attr_to_keep=obs_attr_to_keep
-                                                         )
+                                                   attr_to_keep=obs_attr_to_keep,
+                                                   divide={"gen_p": self._g2op_env.gen_pmax,
+                                                  "load_p": obs_gym["load_p"],
+                                                  "actual_dispatch": self._g2op_env.gen_pmax},)
         # export observation space for the Grid2opEnv
         self.observation_space = Box(shape=self._gym_env.observation_space.shape,
                                      low=self._gym_env.observation_space.low,
-                                     high=self._gym_env.observation_space.high)
+                                     high=self._gym_env.observation_space.high,)
 
     def setup_actions(self):
         # TODO: Your code to specify & modify the action space goes here
@@ -97,7 +99,7 @@ class Gym2OpEnv(gym.Env):
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
         action_space = self._gym_env.action_space
         self._gym_env.action_space.close()
-        act_attr_to_keep = ["redispatch","curtail","set_storage"]
+        act_attr_to_keep = ["redispatch"]
         self._gym_env.action_space = action_space
         self._gym_env.action_space = BoxGymActSpace(self._g2op_env.action_space,
                                                            attr_to_keep=act_attr_to_keep)
@@ -121,6 +123,8 @@ from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.vec_env import VecNormalize
+
 env = Gym2OpEnv()
 
 gym_env = DummyVecEnv(
@@ -141,7 +145,7 @@ model = PPO(
     gamma=0.95,            # Adjusted discount factor for longer-term rewards
     ent_coef=0.05,       # Keep auto, but monitor its decay
     verbose=1,
-    clip_range=0.3,
+    clip_range=0.1,
     tensorboard_log="./tb_logs/",
     device="cuda",
 )
@@ -163,17 +167,17 @@ kwargs = {}
 kwargs["callback"] = callbacks
 
 
-# Load policy weights
-model.load("best_model.zip")
+# # Load policy weights
+# model.load("model.zip")
 
 
 # Train for a certain number of timesteps
 model.learn(
-    total_timesteps=1000000, tb_log_name="PPO_TRAIN" + str(time.time()), **kwargs
+    total_timesteps=500000, tb_log_name="PPO_TRAIN" + str(time.time()), **kwargs
 )
 
 # Save policy weights
-model.save("PPO_GRID.pt")
+model.save("model.zip")
 
 max_steps = 10000
 count_failedActions = 0
@@ -200,7 +204,7 @@ print(f"\t obs = {obs}")
 print(f"\t info = {info}\n\n")
 
 while not is_done and curr_step < max_steps:
-    action = env.action_space.sample()
+    action, _states = model.predict(obs, deterministic=True)
     obs, reward, terminated, truncated, info = env.step(action)
 
     curr_step += 1

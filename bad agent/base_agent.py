@@ -181,7 +181,7 @@ print(f"\t obs = {obs}")
 print(f"\t info = {info}\n\n")
 
 while not is_done and curr_step < max_steps:
-    action = env.action_space.sample()
+    action, _states = model.predict(obs, deterministic=True)
     obs, reward, terminated, truncated, info = env.step(action)
 
     curr_step += 1
