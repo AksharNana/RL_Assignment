@@ -14,6 +14,7 @@ from grid2op.Reward import L2RPNReward, N1Reward, CombinedScaledReward
 from grid2op.gym_compat import GymEnv, BoxGymObsSpace, DiscreteActSpace, BoxGymActSpace, MultiDiscreteActSpace
 import numpy as np
 from lightsim2grid import LightSimBackend
+from grid2op.gym_compat import ScalerAttrConverter
 
 
 # Gymnasium environment wrapper around Grid2Op environment
@@ -72,9 +73,35 @@ class Gym2OpEnv(gym.Env):
             "time_before_cooldown_line":4    
                
         }
+        n_bins = {"rho": 15, "actual_dispatch": 10, "target_dispatch": 10, "time_before_cooldown_line": 8}
+        
         
         # Set up the observation space
+        observation_space = self._gym_env.observation_space
         self._gym_env.observation_space.close()
+        gen_pmax = self._g2op_env.gen_pmax
+
+        observation_space = observation_space.reencode_space("actual_dispatch", 
+                                                    ScalerAttrConverter(substract=0.,
+                                                                        divide= gen_pmax,
+                                                                        init_space=observation_space["actual_dispatch"])
+                                                )
+        
+        observation_space = observation_space.reencode_space("target_dispatch", 
+                                                    ScalerAttrConverter(substract=0.,
+                                                                        divide= gen_pmax,
+                                                                        init_space=observation_space["target_dispatch"])
+                                                )
+        
+        # observation_space = observation_space.reencode_space("rho", 
+        #                                             ScalerAttrConverter(substract=0.,
+        #                                                                 divide= gen_pmax,
+        #                                                                 init_space=observation_space["rho"])
+        #                                         )
+
+        
+        self._gym_env.observation_space = observation_space
+
         self._gym_env.observation_space = BoxGymObsSpace(self._g2op_env.observation_space,
                                                         attr_to_keep=self.obs_attr_to_keep)
         
@@ -85,12 +112,11 @@ class Gym2OpEnv(gym.Env):
         
         # Create bins for each observation attribute
         self.obs_bins = {}
-        n_bins = 10  
         for attr in self.obs_attr_to_keep:
             obs_low = self._gym_env.observation_space.low[self.obs_indices[attr]]
             obs_high = self._gym_env.observation_space.high[self.obs_indices[attr]]
-            # Create bin edges
-            self.obs_bins[attr] = np.linspace(obs_low, obs_high, n_bins)
+            self.obs_bins[attr] = np.linspace(obs_low, obs_high, n_bins.get(attr, 10))  # Default to 10 bins
+
 
     def discretise_observation(self, obs):
         # Convert continuous observations to discrete using bins
