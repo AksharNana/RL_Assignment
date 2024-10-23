@@ -1,0 +1,135 @@
+Action = [0.08219839 0.04669631 0.         0.         0.         0.20953684]
+step = 1379: 
+         reward = 0.2608385980129242
+         terminated = False
+         truncated = False
+         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0032', 'rewards': {}}
+         is action valid = True
+
+
+Action = [0.08229774 0.06012795 0.         0.         0.         0.19096364]
+step = 1380: 
+         reward = 0.2560906410217285
+         terminated = False
+         truncated = False
+         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0032', 'rewards': {}}
+         is action valid = True
+
+
+Action = [0.10982022 0.05226355 0.         0.02063282 0.         0.297922  ]
+step = 1381: 
+         reward = 0.2537387013435364
+         terminated = False
+         truncated = False
+         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0032', 'rewards': {}}
+         is action valid = True
+
+
+Action = [0.10608125 0.04705539 0.         0.01516196 0.         0.2957344 ]
+step = 1382: 
+         reward = 0.2518123984336853
+         terminated = False
+         truncated = False
+         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+       -1, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0032', 'rewards': {}}
+         is action valid = True
+
+
+Action = [0.10052951 0.06405189 0.         0.         0.         0.28762513]
+step = 1383: 
+         reward = -0.5
+         terminated = True
+         truncated = False
+         info = {'disc_lines': array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  1,  2, -1,  2,  2, -1, -1,
+        0, -1, -1], dtype=int32), 'is_illegal': False, 'is_ambiguous': False, 'is_dispatching_illegal': False, 'is_illegal_reco': False, 'reason_alarm_illegal': None, 'reason_alert_illegal': None, 'opponent_attack_line': None, 'opponent_attack_sub': None, 'opponent_attack_duration': 0, 'exception': [Grid2OpException BackendError BackendError('Divergence of DC powerflow (non connected grid) at the initialization of AC powerflow. Detailed error: ErrorType.SolverFactor')], 'time_series_id': '/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0032', 'rewards': {}}
+         is action valid = True
+
+
+###########
+# SUMMARY #
+###########
+return = 467.5089090168476
+total steps = 1383
+Number of failed actions = 0
+###########
+{
+          "0": {
+                    "time serie id": 0,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0033",
+                    "steps survived": 1282,
+                    "total steps": 8064,
+                    "cum reward": 448.5346747934818
+          },
+          "1": {
+                    "time serie id": 1,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0034",
+                    "steps survived": 5123,
+                    "total steps": 8064,
+                    "cum reward": 1773.1769944280386
+          },
+          "2": {
+                    "time serie id": 2,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0035",
+                    "steps survived": 2515,
+                    "total steps": 8064,
+                    "cum reward": 871.9576890766621
+          },
+          "3": {
+                    "time serie id": 3,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0036",
+                    "steps survived": 5025,
+                    "total steps": 8064,
+                    "cum reward": 1705.7468458414078
+          },
+          "4": {
+                    "time serie id": 4,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0037",
+                    "steps survived": 517,
+                    "total steps": 8064,
+                    "cum reward": 177.19128449261189
+          },
+          "5": {
+                    "time serie id": 5,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0038",
+                    "steps survived": 4553,
+                    "total steps": 8064,
+                    "cum reward": 1581.9697130024433
+          },
+          "6": {
+                    "time serie id": 6,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0039",
+                    "steps survived": 1080,
+                    "total steps": 8064,
+                    "cum reward": 365.3440179377794
+          },
+          "7": {
+                    "time serie id": 7,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0040",
+                    "steps survived": 513,
+                    "total steps": 8064,
+                    "cum reward": 179.37360329926014
+          },
+          "8": {
+                    "time serie id": 8,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0041",
+                    "steps survived": 4544,
+                    "total steps": 8064,
+                    "cum reward": 1579.329801440239
+          },
+          "9": {
+                    "time serie id": 9,
+                    "time serie folder": "/home/akshar/data_grid2op/l2rpn_case14_sandbox/chronics/0042",
+                    "steps survived": 805,
+                    "total steps": 8064,
+                    "cum reward": 285.21845772862434
+          }
+}
+###########
+# SUMMARY #
+###########
+Average reward = 896.7843082040548
+total steps survived= 2595.7
+###########
