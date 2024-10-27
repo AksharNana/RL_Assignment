@@ -63,12 +63,18 @@ class Gym2OpEnv(gym.Env):
         # TODO: Your code to specify & modify the observation space goes here
         # See Grid2Op 'getting started' notebooks for guidance
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
+    
+        # Base observation space attributes that will be kept
+
         obs_attr_to_keep = ["day_of_week", "hour_of_day", "minute_of_hour", "gen_p", "gen_q", "load_p", "load_q",
                     "actual_dispatch", "rho", "line_status", "storage_power", "storage_charge","connectivity_matrix"]
 
         observation_space = self._gym_env.observation_space
         self._gym_env.observation_space.close()
         obs_gym, info = self._gym_env.reset()
+
+        # Rescaling attributes in the observation space to be roughly from 0 to 1
+
         observation_space = observation_space.reencode_space("gen_p",
                                    ScalerAttrConverter(substract=0.,
                                                        divide=self._g2op_env.gen_pmax
@@ -100,6 +106,9 @@ class Gym2OpEnv(gym.Env):
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
         action_space = self._gym_env.action_space
         self._gym_env.action_space.close()
+    
+        # Base action space attributes that will be kept
+
         act_attr_to_keep = ["redispatch","set_storage"]
         self._gym_env.action_space = action_space
         self._gym_env.action_space = BoxGymActSpace(self._g2op_env.action_space,
@@ -138,6 +147,9 @@ gym_env = DummyVecEnv(
 
 vec_env = make_vec_env(lambda : Gym2OpEnv(), n_envs=4)
 
+# Create a PPO model, and pass in the vectorized gym environment
+
+
 model = PPO(
     "MlpPolicy",
     vec_env,
@@ -150,6 +162,8 @@ model = PPO(
     tensorboard_log="./tb_logs/",
     device="cuda",
 )
+
+# Specify callbacks for evaluation and early stopping
 
 callbacks = []
 eval_callback = EvalCallback(
@@ -189,6 +203,10 @@ model.learn(
 
 # Save policy weights
 model.save("model.zip")
+
+
+# Given evaluation code
+
 
 max_steps = 10000
 count_failedActions = 0
@@ -248,6 +266,7 @@ print(f"Number of failed actions = {count_failedActions}")
 print("###########")
 
 
+# Custom evaluation code, evaluate over 10 episodes until termination. Stores the results in a ep_infos object, print as json.
 
 nb_episode_test = 10
 ep_infos = {}  # information that will be saved
