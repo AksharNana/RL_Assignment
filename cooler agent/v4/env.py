@@ -88,16 +88,73 @@ class Gym2OpEnv(gym.Env):
             # Create bin edges
             self.obs_bins[attr] = np.linspace(obs_low, obs_high, n_bins)
 
-    def discretise_observation(self, obs):
-        # Convert continuous observations to discrete using bins
-        discrete_obs = []
-        for attr in self.obs_attr_to_keep:
-            # Digitize each observation using the corresponding bins
-            index = self.obs_indices[attr]
-            bin_edges = self.obs_bins[attr]
-            digitized_value = np.digitize(obs[index], bin_edges) - 1  # Adjust index to start from 0
-            discrete_obs.append(digitized_value)
-        return np.array(discrete_obs)
+    def discretise_observation(self, obs, reset = True):
+
+        if reset:
+            # Extract the NumPy array from the observation tuple
+            values = obs[0]  # This gets the array part of the tuple
+            # print(f"Values: {values}")
+            discrete_obs = {}
+            
+            # Initialize a current index to track position in the values array
+            current_index = 0
+            
+            # Iterate through the attributes and discretize their values
+            for attr in self.obs_attr_to_keep:
+                dim = self._gym_env.observation_space._dims[self.obs_indices[attr]]
+                # print(f"Attribute: {attr}, Dimension: {dim}")
+                value_slice = values[current_index:current_index + dim]    # Extract the relevant slice for the attribute
+                bin_edges = self.obs_bins[attr]  # Get the bin edges for the attribute
+                
+                # Discretize each value in the slice individually
+                digitized_values = np.digitize(value_slice, bin_edges) - 1  # Adjust index to start from 0
+                
+                # Store the discretized values
+                discrete_obs[attr] = digitized_values
+                
+                # Update the current index for the next attribute
+                current_index += dim
+            
+            # Convert the dictionary of discretized observations back into a regular numpy array
+            discrete_array = np.concatenate(list(discrete_obs.values()))
+            
+            # print(f"Discrete observation as array: {discrete_array}, of size: {discrete_array.size}")
+            
+            # Return a tuple like the original observation, consisting of the discretized array and obs[1]
+            return (discrete_array, obs[1])
+        else:
+            # Extract the NumPy array from the observation tuple
+            values = obs  # This gets the array part of the tuple
+            # print(f"Values: {values}")
+            discrete_obs = {}
+            
+            # Initialize a current index to track position in the values array
+            current_index = 0
+            
+            # Iterate through the attributes and discretize their values
+            for attr in self.obs_attr_to_keep:
+                dim = self._gym_env.observation_space._dims[self.obs_indices[attr]]
+                # print(f"Attribute: {attr}, Dimension: {dim}")
+                value_slice = values[current_index:current_index + dim]    # Extract the relevant slice for the attribute
+                bin_edges = self.obs_bins[attr]  # Get the bin edges for the attribute
+                
+                # Discretize each value in the slice individually
+                digitized_values = np.digitize(value_slice, bin_edges) - 1  # Adjust index to start from 0
+                
+                # Store the discretized values
+                discrete_obs[attr] = digitized_values
+                
+                # Update the current index for the next attribute
+                current_index += dim
+            
+            # Convert the dictionary of discretized observations back into a regular numpy array
+            discrete_array = np.concatenate(list(discrete_obs.values()))
+            
+            # print(f"Discrete observation as array: {discrete_array}, of size: {discrete_array.size}")
+            
+            # Return a tuple like the original observation, consisting of the discretized array and obs[1]
+            return (discrete_array)
+
 
 
     def setup_actions(self):
@@ -112,10 +169,24 @@ class Gym2OpEnv(gym.Env):
         self.action_space = self._gym_env.action_space
 
     def reset(self, seed=None):
-        return self._gym_env.reset(seed=seed, options=None)
+        obs = self._gym_env.reset(seed=seed, options=None)  # Ensure this returns a dictionary
+       
+        discrete_obs = self.discretise_observation(obs, reset = True)
+        return discrete_obs
+        # return self._gym_env.reset(seed=seed, options=None)
+
 
     def step(self, action):
-        return self._gym_env.step(action)
+        # Step through the underlying Grid2Op environment
+        obs, reward, done, truncated, info = self._gym_env.step(action)
+        
+        
+        # Discretize the observation
+        # print(obs)
+        discrete_obs = self.discretise_observation(obs, reset = False)
+        
+        return discrete_obs, reward, done, truncated, info
+        # return self._gym_env.step(action)
 
     def render(self):
         # TODO: Modify for your own required usage

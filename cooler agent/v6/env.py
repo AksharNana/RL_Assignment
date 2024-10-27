@@ -3,8 +3,6 @@ import time
 import gymnasium as gym
 from gymnasium.spaces import Discrete, MultiDiscrete, Box
 
-#scale the observations/actions
-
 import grid2op
 from grid2op import gym_compat
 from grid2op.Parameters import Parameters
@@ -14,7 +12,6 @@ from grid2op.Reward import L2RPNReward, N1Reward, CombinedScaledReward
 from grid2op.gym_compat import GymEnv, BoxGymObsSpace, DiscreteActSpace, BoxGymActSpace, MultiDiscreteActSpace
 import numpy as np
 from lightsim2grid import LightSimBackend
-from grid2op.gym_compat import ScalerAttrConverter
 
 
 # Gymnasium environment wrapper around Grid2Op environment
@@ -63,45 +60,11 @@ class Gym2OpEnv(gym.Env):
 
     def setup_observations(self):
         # Define attribute names and their corresponding indices in the observation array
-        self.obs_attr_to_keep = ["rho", "line_status", "actual_dispatch", "target_dispatch", "time_before_cooldown_line"]
+        self.obs_attr_to_keep = ["rho", "p_or", "gen_p", "load_p"]
         
-        self.obs_indices = {
-            "rho": 0,  
-            "line_status":1, 
-            "actual_dispatch":2, 
-            "target_dispatch":3, 
-            "time_before_cooldown_line":4    
-               
-        }
-        n_bins = {"rho": 15, "actual_dispatch": 10, "target_dispatch": 10, "time_before_cooldown_line": 8}
-        
-        
+    
         # Set up the observation space
-        observation_space = self._gym_env.observation_space
         self._gym_env.observation_space.close()
-        gen_pmax = self._g2op_env.gen_pmax
-
-        observation_space = observation_space.reencode_space("actual_dispatch", 
-                                                    ScalerAttrConverter(substract=0.,
-                                                                        divide= gen_pmax,
-                                                                        init_space=observation_space["actual_dispatch"])
-                                                )
-        
-        observation_space = observation_space.reencode_space("target_dispatch", 
-                                                    ScalerAttrConverter(substract=0.,
-                                                                        divide= gen_pmax,
-                                                                        init_space=observation_space["target_dispatch"])
-                                                )
-        
-        # observation_space = observation_space.reencode_space("rho", 
-        #                                             ScalerAttrConverter(substract=0.,
-        #                                                                 divide= gen_pmax,
-        #                                                                 init_space=observation_space["rho"])
-        #                                         )
-
-        
-        self._gym_env.observation_space = observation_space
-
         self._gym_env.observation_space = BoxGymObsSpace(self._g2op_env.observation_space,
                                                         attr_to_keep=self.obs_attr_to_keep)
         
@@ -110,27 +73,6 @@ class Gym2OpEnv(gym.Env):
                                      low=self._gym_env.observation_space.low,
                                      high=self._gym_env.observation_space.high)
         
-        # Create bins for each observation attribute
-        self.obs_bins = {}
-        for attr in self.obs_attr_to_keep:
-            obs_low = self._gym_env.observation_space.low[self.obs_indices[attr]]
-            obs_high = self._gym_env.observation_space.high[self.obs_indices[attr]]
-            self.obs_bins[attr] = np.linspace(obs_low, obs_high, n_bins.get(attr, 10))  # Default to 10 bins
-
-
-    def discretise_observation(self, obs):
-        # Convert continuous observations to discrete using bins
-        discrete_obs = []
-        for attr in self.obs_attr_to_keep:
-            index = self.obs_indices[attr]
-            bin_edges = self.obs_bins[attr]
-            digitized_value = np.digitize(obs[index], bin_edges) - 1  # Adjust index to start from 0
-            
-            # Handle out-of-bounds values
-            digitized_value = np.clip(digitized_value, 0, len(bin_edges) - 2)
-            discrete_obs.append(digitized_value)
-        return np.array(discrete_obs)
-
 
 
     def setup_actions(self):
@@ -139,7 +81,7 @@ class Gym2OpEnv(gym.Env):
         #  - Notebooks: https://github.com/rte-france/Grid2Op/tree/master/getting_started
 
         self._gym_env.action_space.close()
-        act_attr_to_keep =  ["change_line_status", "redispatch"]
+        act_attr_to_keep =  ["set_line_status", "set_bus"]
         self._gym_env.action_space = DiscreteActSpace(self._g2op_env.action_space,
                                                       attr_to_keep=act_attr_to_keep)
         self.action_space = self._gym_env.action_space

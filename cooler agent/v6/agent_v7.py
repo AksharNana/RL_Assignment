@@ -41,16 +41,16 @@ eval_callback = EvalCallback(
     n_eval_episodes=5,
     best_model_save_path="./models/",
     log_path="./logs/",
-    eval_freq=5000,  
+    eval_freq=5000,
 )
 
 # Early stopping callback
 early_stopping_callback = EarlyStoppingCallback(
-    eval_freq=2500,
-    patience=10,
-    min_timesteps=20000,  
+    eval_freq=500000,
+    patience=50,
+    min_timesteps=200000,  
     verbose=1,
-    best_model_save_path="./models",
+    best_model_save_path="./models_rollout",
 
 )
 
@@ -65,7 +65,9 @@ model.learn(
 
 # Save the final model
 model.save("DQN_FINAL_GRID.pt")
-
+# Load the best model
+model_path = "./models/best_model"  # Path where the best model is saved
+model = DQN.load(model_path, gym_env)
 # Testing the agent
 nb_episode_test = 5
 seeds_test_env = (0, 1, 2, 3, 4, 5)    # Same size as nb_episode_test
@@ -121,52 +123,60 @@ print("###########")
 '''
 RESULTS
 
+Step 55000, mean reward: 109.69
+Stopping training at step 55000 due to no improvement.
 {
     "0": {
         "time serie id": 0,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0308",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0264",
         "env seed": 0,
         "agent seed": 2,
-        "steps survived": 3401,
+        "steps survived": 2818,
         "total steps": 8064,
-        "cum reward": 1166.9003952145576
+        "cum reward": 990.8136456012726
     },
     "1": {
         "time serie id": 1,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0309",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0265",
         "env seed": 1,
         "agent seed": 3,
-        "steps survived": 2816,
+        "steps survived": 2822,
         "total steps": 8064,
-        "cum reward": 967.8494017571211
+        "cum reward": 957.5585479736328
     },
     "2": {
         "time serie id": 2,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0310",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0266",
         "env seed": 2,
         "agent seed": 4,
-        "steps survived": 2412,
+        "steps survived": 6452,
         "total steps": 8064,
-        "cum reward": 848.4968295246363
+        "cum reward": 2258.7024085223675
     },
     "3": {
         "time serie id": 3,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0311",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0267",
         "env seed": 3,
         "agent seed": 5,
-        "steps survived": 1384,
+        "steps survived": 1091,
         "total steps": 8064,
-        "cum reward": 476.31639325618744
+        "cum reward": 383.7996412217617
     },
     "4": {
         "time serie id": 4,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0312",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0268",
         "env seed": 4,
         "agent seed": 6,
-        "steps survived": 2535,
+        "steps survived": 5001,
         "total steps": 8064,
-        "cum reward": 875.305461063981
+        "cum reward": 1725.6886424273252
     }
 }
+###########
+# SUMMARY #
+###########
+Average reward = 631.6562885746359
+total steps survived= 1818.4
+###########
 
 '''

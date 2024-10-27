@@ -1,12 +1,22 @@
 from stable_baselines3 import DQN
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
 from env import Gym2OpEnv
 import json
 import time
 
 env = Gym2OpEnv()
 gym_env = DummyVecEnv([lambda: Monitor(env)])
+
+# Evaluation setup
+eval_callback = EvalCallback(
+    env,
+    n_eval_episodes=5,
+    best_model_save_path="./models/",
+    log_path="./logs/",
+    eval_freq=5000,  
+)
 
 # DQN model
 model = DQN(
@@ -23,7 +33,7 @@ model = DQN(
 )
 
 # Train the model
-model.learn(total_timesteps=500000)
+model.learn(total_timesteps=100000, callback=eval_callback)
 
 # Save and load the model
 model.save("DQN_GRID.pt")
@@ -58,3 +68,57 @@ for ep_test_num in range(nb_episode_test):
                              "cum reward": cum_reward}
     
 print(json.dumps(ep_infos, indent=4))
+
+
+
+'''
+RESULTS
+
+{
+    "0": {
+        "time serie id": 0,
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0229",
+        "env seed": 0,
+        "agent seed": 3,
+        "steps survived": 505,
+        "total steps": 8064,
+        "cum reward": 168.40298935770988
+    },
+    "1": {
+        "time serie id": 1,
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0230",
+        "env seed": 1,
+        "agent seed": 4,
+        "steps survived": 1555,
+        "total steps": 8064,
+        "cum reward": 520.6443214863539
+    },
+    "2": {
+        "time serie id": 2,
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0231",
+        "env seed": 2,
+        "agent seed": 5,
+        "steps survived": 7140,
+        "total steps": 8064,
+        "cum reward": 2365.074905887246
+    },
+    "3": {
+        "time serie id": 3,
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0232",
+        "env seed": 3,
+        "agent seed": 6,
+        "steps survived": 3398,
+        "total steps": 8064,
+        "cum reward": 1123.7968561947346
+    },
+    "4": {
+        "time serie id": 4,
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0233",
+        "env seed": 4,
+        "agent seed": 7,
+        "steps survived": 664,
+        "total steps": 8064,
+        "cum reward": 225.2086575627327
+    }
+}
+'''

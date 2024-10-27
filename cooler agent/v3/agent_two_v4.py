@@ -1,12 +1,24 @@
 from stable_baselines3 import DQN
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
 from env import Gym2OpEnv
 import json
 import time
 
 env = Gym2OpEnv()
 gym_env = DummyVecEnv([lambda: Monitor(env)])
+
+policy_kwargs = dict(net_arch=[128, 128])  # Two layers of 128 units each
+
+# Evaluation setup
+eval_callback = EvalCallback(
+    env,
+    n_eval_episodes=5,
+    best_model_save_path="./models/",
+    log_path="./logs/",
+    eval_freq=5000,  
+)
 
 # DQN model
 model = DQN(
@@ -15,15 +27,16 @@ model = DQN(
     learning_rate=0.001,
     batch_size=32,
     gamma=0.99,
-    exploration_fraction=0.5,
-    exploration_final_eps=0.05,
-    target_update_interval=5000,
+    exploration_fraction=0.1,
+    exploration_final_eps=0.02,
+    target_update_interval=500,
     verbose=1,
     tensorboard_log="./tb_logs/",
+    policy_kwargs=policy_kwargs  # Use the custom architecture
 )
 
 # Train the model
-model.learn(total_timesteps=500000)
+model.learn(total_timesteps=100000, callback=eval_callback)
 
 # Save and load the model
 model.save("DQN_GRID.pt")
@@ -62,53 +75,57 @@ print(json.dumps(ep_infos, indent=4))
 
 
 '''
-RESULTS
+results
+
 
 {
     "0": {
         "time serie id": 0,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0001",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0571",
         "env seed": 0,
         "agent seed": 3,
-        "steps survived": 517,
+        "steps survived": 1369,
         "total steps": 8064,
-        "cum reward": 94.26346498215571
+        "cum reward": 415.702832326293
     },
     "1": {
         "time serie id": 1,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0002",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0572",
         "env seed": 1,
         "agent seed": 4,
-        "steps survived": 375,
+        "steps survived": 1097,
         "total steps": 8064,
-        "cum reward": 127.49013972689863
+        "cum reward": 354.4544506967068
     },
     "2": {
         "time serie id": 2,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0003",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0573",
         "env seed": 2,
         "agent seed": 5,
-        "steps survived": 3,
+        "steps survived": 3113,
         "total steps": 8064,
-        "cum reward": 0.10363349318504333
+        "cum reward": 966.2978384308517
     },
     "3": {
         "time serie id": 3,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0004",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0574",
         "env seed": 3,
         "agent seed": 6,
-        "steps survived": 396,
+        "steps survived": 1258,
         "total steps": 8064,
-        "cum reward": 77.5135142885847
+        "cum reward": 415.95231018960476
     },
     "4": {
         "time serie id": 4,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0005",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0575",
         "env seed": 4,
         "agent seed": 7,
-        "steps survived": 247,
+        "steps survived": 518,
         "total steps": 8064,
-        "cum reward": 49.33673713589087
+        "cum reward": 168.604027017951
     }
 }
+
+
+avg = 464.21
 '''

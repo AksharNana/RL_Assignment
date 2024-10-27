@@ -47,8 +47,8 @@ eval_callback = EvalCallback(
 # Early stopping callback
 early_stopping_callback = EarlyStoppingCallback(
     eval_freq=5000,
-    patience=10,
-    min_timesteps=100000,  
+    patience=5,
+    min_timesteps=20000,  
     verbose=1,
     best_model_save_path="./models",
 
@@ -58,7 +58,7 @@ early_stopping_callback = EarlyStoppingCallback(
 
 # Train model with both callbacks
 model.learn(
-    total_timesteps=500000,
+    total_timesteps=100000,
     tb_log_name="DQN_TRAIN_" + str(time.time()),
     callback=[eval_callback, early_stopping_callback]
 )
@@ -66,13 +66,12 @@ model.learn(
 # Save the final model
 model.save("DQN_FINAL_GRID.pt")
 
-# Testing the agent
 nb_episode_test = 5
-seeds_test_env = (0, 1, 2, 3, 4, 5)    # Same size as nb_episode_test
-seeds_test_agent = (2, 3, 4, 5, 6, 7)  # Same size as nb_episode_test
-ts_ep_test =  (0, 1, 2, 3, 4, 5)       # Same size as nb_episode_test
+seeds_test_env = (0, 1, 2, 3, 4, 5)    
+seeds_test_agent = (2, 3, 4, 5, 6, 7) 
+ts_ep_test =  (0, 1, 2, 3, 4, 5)       
 
-ep_infos = {}  # Information that will be saved
+ep_infos = {}  
 
 total_cum_reward = 0
 total_steps_survived = 0
@@ -113,7 +112,7 @@ print("###########")
 print("# SUMMARY #")
 print("###########")
 print(f"Average reward = {avg_rew}")
-print(f"total steps survived= {avg_step}")
+print(f"Average steps survived= {avg_step}")
 print("###########")
 
 
@@ -121,61 +120,60 @@ print("###########")
 '''
 RESULTS
 
-Step 295000, mean reward: 106.53
-Stopping training at step 295000 due to no improvement.
+Step 65000, mean reward: 141.01
+Stopping training at step 90000 due to no improvement.
 {
     "0": {
         "time serie id": 0,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0035",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0001",
         "env seed": 0,
         "agent seed": 2,
-        "steps survived": 2514,
+        "steps survived": 1094,
         "total steps": 8064,
-        "cum reward": 851.3068607002497
+        "cum reward": 343.3578895330429
     },
     "1": {
         "time serie id": 1,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0036",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0002",
         "env seed": 1,
         "agent seed": 3,
-        "steps survived": 3573,
+        "steps survived": 6856,
         "total steps": 8064,
-        "cum reward": 1190.0977387428284
+        "cum reward": 2194.3564854711294
     },
     "2": {
         "time serie id": 2,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0037",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0003",
         "env seed": 2,
         "agent seed": 4,
-        "steps survived": 517,
+        "steps survived": 1092,
         "total steps": 8064,
-        "cum reward": 176.18693888187408
+        "cum reward": 352.22930155694485
     },
     "3": {
         "time serie id": 3,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0038",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0004",
         "env seed": 3,
         "agent seed": 5,
-        "steps survived": 4551,
+        "steps survived": 3110,
         "total steps": 8064,
-        "cum reward": 1554.1877049654722
+        "cum reward": 1016.5659163296223
     },
     "4": {
         "time serie id": 4,
-        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0039",
+        "time serie folder": "/home/suvarn/data_grid2op/l2rpn_case14_sandbox/chronics/0005",
         "env seed": 4,
         "agent seed": 6,
-        "steps survived": 1060,
+        "steps survived": 8064,
         "total steps": 8064,
-        "cum reward": 353.24588499963284
+        "cum reward": 2576.3159478008747
     }
 }
 ###########
 # SUMMARY #
 ###########
-Average reward = 412.5025128290057
-avg steps survived= 1221.5
+Average reward = 1296.5651081383228
+Total steps survived= 4043.2
 ###########
-
 
 '''
