@@ -145,7 +145,7 @@ kwargs["callback"] = callbacks
 
 # Train for a certain number of timesteps
 model.learn(
-    total_timesteps=15000, tb_log_name="PPO_TRAIN" + str(time.time()), **kwargs
+    total_timesteps=500000, tb_log_name="PPO_TRAIN" + str(time.time()), **kwargs
 )
 
 # # Save policy weights
