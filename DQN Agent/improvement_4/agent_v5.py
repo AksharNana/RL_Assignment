@@ -63,57 +63,57 @@ model.learn(
     callback=[eval_callback, early_stopping_callback]
 )
 
-# Save the final model
-model.save("DQN_FINAL_GRID.pt")
+# # Save the final model
+# model.save("DQN_FINAL_GRID.pt")
 
-nb_episode_test = 5
-seeds_test_env = (0, 1, 2, 3, 4, 5)    
-seeds_test_agent = (2, 3, 4, 5, 6, 7) 
-ts_ep_test =  (0, 1, 2, 3, 4, 5)       
+# nb_episode_test = 5
+# seeds_test_env = (0, 1, 2, 3, 4, 5)    
+# seeds_test_agent = (2, 3, 4, 5, 6, 7) 
+# ts_ep_test =  (0, 1, 2, 3, 4, 5)       
 
-ep_infos = {}  
+# ep_infos = {}  
 
-total_cum_reward = 0
-total_steps_survived = 0
+# total_cum_reward = 0
+# total_steps_survived = 0
 
-for ep_test_num in range(nb_episode_test):
-    init_obs, init_infos = env.reset(seed=seeds_test_env[ep_test_num])
-    model.set_random_seed(seeds_test_agent[ep_test_num])
-    done = False
-    cum_reward = 0
-    step_survived = 0
-    obs = init_obs
-    while not done:
-        act, _states = model.predict(obs, deterministic=True)
-        obs, reward, terminated, truncated, info = env.step(act)
-        step_survived += 1
-        cum_reward += float(reward)
-        done = terminated or truncated
+# for ep_test_num in range(nb_episode_test):
+#     init_obs, init_infos = env.reset(seed=seeds_test_env[ep_test_num])
+#     model.set_random_seed(seeds_test_agent[ep_test_num])
+#     done = False
+#     cum_reward = 0
+#     step_survived = 0
+#     obs = init_obs
+#     while not done:
+#         act, _states = model.predict(obs, deterministic=True)
+#         obs, reward, terminated, truncated, info = env.step(act)
+#         step_survived += 1
+#         cum_reward += float(reward)
+#         done = terminated or truncated
 
-    total_steps_survived += step_survived
-    total_cum_reward += cum_reward
+#     total_steps_survived += step_survived
+#     total_cum_reward += cum_reward
 
-    ep_infos[ep_test_num] = {
-        "time serie id": ts_ep_test[ep_test_num],
-        "time serie folder": env._gym_env.init_env.chronics_handler.get_id(),
-        "env seed": seeds_test_env[ep_test_num],
-        "agent seed": seeds_test_agent[ep_test_num],
-        "steps survived": step_survived,
-        "total steps": int(env._gym_env.init_env.max_episode_duration()),
-        "cum reward": cum_reward
-    }
+#     ep_infos[ep_test_num] = {
+#         "time serie id": ts_ep_test[ep_test_num],
+#         "time serie folder": env._gym_env.init_env.chronics_handler.get_id(),
+#         "env seed": seeds_test_env[ep_test_num],
+#         "agent seed": seeds_test_agent[ep_test_num],
+#         "steps survived": step_survived,
+#         "total steps": int(env._gym_env.init_env.max_episode_duration()),
+#         "cum reward": cum_reward
+#     }
 
-print(json.dumps(ep_infos, indent=4))
+# print(json.dumps(ep_infos, indent=4))
 
 
-avg_rew = total_cum_reward / 10
-avg_step = total_steps_survived / 10
-print("###########")
-print("# SUMMARY #")
-print("###########")
-print(f"Average reward = {avg_rew}")
-print(f"Average steps survived= {avg_step}")
-print("###########")
+# avg_rew = total_cum_reward / 10
+# avg_step = total_steps_survived / 10
+# print("###########")
+# print("# SUMMARY #")
+# print("###########")
+# print(f"Average reward = {avg_rew}")
+# print(f"Average steps survived= {avg_step}")
+# print("###########")
 
 
 
